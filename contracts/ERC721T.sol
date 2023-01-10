@@ -43,7 +43,7 @@ contract ERC721T is ERC721, Ownable, GenericErrorsAndEvents {
     }
 
     function _transfer(address from, address to, uint256 tokenId) internal override {
-        if (from != leagueLedger) {
+        if (from != address(0)) {
             revert("Trophies cannot be moved once gifted.");
         }
         super._transfer(from, to, tokenId);
