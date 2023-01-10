@@ -2,3 +2,4 @@ node_modules/*
 keys/*
 cache/*
 artifacts/*
+.DS_STORE
