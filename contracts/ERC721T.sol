@@ -3,30 +3,43 @@ pragma solidity ^0.8.17;
 
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { Ownable } from "./utils/Ownable.sol";
+import { GenericErrorsAndEvents } from "./utils/GenericErrorsAndEvents.sol";
 
-contract ERC721T is ERC721, Ownable {
+contract ERC721T is ERC721, Ownable, GenericErrorsAndEvents {
 
     address public leagueLedger;
     uint256 public lastTokenIdMinted;
+    bool initalized;
 
-    constructor() ERC721("Trophy", "TROPHY") {}
+    constructor() {}
 
-    modifier onlyLeagueMember {
+    modifier onlyLeagueLedger {
         if (msg.sender != leagueLedger) {
             revert("Only the league ledger can call this function");
         }
         _;
+    }
+
+    function initalizeERC721T(
+        string calldata name_,
+        string calldata symbol_,
+        address leagueLedger_
+    ) public onlyOwner {
+        if (initalized) {
+            revert AlreadyInitialized();
+        }
+        _name = name_; 
+        _symbol = symbol_;
+        leagueLedger = leagueLedger_;
+        initalized = true;
     }
     
     function changeLeagueLedger(address newLeagueLedger) external onlyOwner {
         leagueLedger = newLeagueLedger;
     }
 
-    function mint(uint256 numTokensToMint) external onlyLeagueMember {
-        for (uint i = lastTokenIdMinted; i < numTokensToMint + 1; ++i) {
-            _mint(leagueLedger, i);
-        }
-        lastTokenIdMinted+=numTokensToMint;
+    function mint(address winner) external onlyLeagueLedger{
+        _mint(winner, lastTokenIdMinted++);
     }
 
     function _transfer(address from, address to, uint256 tokenId) internal override {

@@ -2,6 +2,17 @@
 pragma solidity ^0.8.17;
 
 interface IERC721TManager {
-    function mint(uint256 numTrophiesToMint) external;
-    function safeTransferFrom(address from, address to, uint256 tokenId) external;
+    function mint(address winner) external;
+
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) external;
+
+    function initalizeERC721T(
+        string calldata name_,
+        string calldata symbol_,
+        address leagueLedger_
+    ) external;
 }

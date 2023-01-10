@@ -3,17 +3,20 @@ pragma solidity ^0.8.17;
 
 import { Ownable } from "./utils/Ownable.sol";
 import { EnumerableSet } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import { GenericErrorsAndEvents } from "./utils/GenericErrorsAndEvents.sol";
 import { LeagueLedgerStructs } from "./structs/LeagueLedgerStructs.sol";
 import { IERC721TManager } from "./interfaces/IERC721TManager.sol";
 
-contract CatanLeagueLedger is Ownable, LeagueLedgerStructs {
+contract CatanLeagueLedger is Ownable, LeagueLedgerStructs, GenericErrorsAndEvents {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     EnumerableSet.AddressSet private leagueMembers;
     address public leagueERC721Trophy;
+    address public leagueFactory;
     uint256 public matchCount;
     mapping(address => uint256) public leagueMemberWins;
     mapping(bytes => ProposedMatchResult) public stagedMatchResults;
+    bool initialized;
 
     event MatchResult(uint256[] victoryPoints, address[] leagueParticipants);
 
@@ -28,6 +31,16 @@ contract CatanLeagueLedger is Ownable, LeagueLedgerStructs {
         _;
     }
 
+    function initalizeLedger(
+        address leagueFactory_
+    ) external onlyOwner {
+        if (initialized) {
+            revert AlreadyInitialized();
+        }
+        leagueFactory = leagueFactory_;
+        initialized = true;
+    }
+
     function addLeagueMember(address newMember) external onlyLeagueMember {
         leagueMembers.add(newMember);
     }
@@ -39,10 +52,6 @@ contract CatanLeagueLedger is Ownable, LeagueLedgerStructs {
     function changeLeagueERC721Trophy(address newLeagueERC721Trophy) external onlyOwner {
         leagueERC721Trophy = newLeagueERC721Trophy;
         matchCount = 0;
-    }
-
-    function mintTrophy(uint256 numTrophiesToMint) external onlyOwner {
-        IERC721TManager(leagueERC721Trophy).mint(numTrophiesToMint);
     }
 
     function proposeMatchResult(uint256[] memory victoryPoints, address[] memory leagueParticipants) external onlyLeagueMember {
@@ -76,7 +85,7 @@ contract CatanLeagueLedger is Ownable, LeagueLedgerStructs {
         }
         leagueMemberWins[winner]++;
         matchCount++;
-        IERC721TManager(leagueERC721Trophy).safeTransferFrom(address(this), winner, matchCount);
+        IERC721TManager(leagueERC721Trophy).mint(winner);
         emit MatchResult(victoryPoints, leagueParticipants);
     }
 
