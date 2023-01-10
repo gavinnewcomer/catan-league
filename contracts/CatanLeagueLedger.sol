@@ -85,7 +85,7 @@ contract CatanLeagueLedger is Ownable, LeagueLedgerStructs, GenericErrorsAndEven
         }
         leagueMemberWins[winner]++;
         matchCount++;
-        IERC721TManager(leagueERC721Trophy).mint(winner);
+        IERC721TManager(leagueERC721Trophy).mint(winner, matchCount);
         emit MatchResult(victoryPoints, leagueParticipants);
     }
 

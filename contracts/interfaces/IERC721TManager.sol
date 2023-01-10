@@ -2,7 +2,7 @@
 pragma solidity ^0.8.17;
 
 interface IERC721TManager {
-    function mint(address winner) external;
+    function mint(address winner, uint256 tokenId) external;
 
     function safeTransferFrom(
         address from,

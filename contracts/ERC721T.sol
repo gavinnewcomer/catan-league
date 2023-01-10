@@ -38,8 +38,8 @@ contract ERC721T is ERC721, Ownable, GenericErrorsAndEvents {
         leagueLedger = newLeagueLedger;
     }
 
-    function mint(address winner) external onlyLeagueLedger{
-        _mint(winner, lastTokenIdMinted++);
+    function mint(address winner, uint256 tokenId) external onlyLeagueLedger{
+        _mint(winner, tokenId);
     }
 
     function _transfer(address from, address to, uint256 tokenId) internal override {
